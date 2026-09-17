@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Experiment Log v2.0</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #07111f;
+      color: #eaf2ff;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      background: #2563eb;
+      color: white;
+      font-weight: bold;
+    }
+
+    button:hover {
+      filter: brightness(1.12);
+    }
+
+    button.secondary {
+      background: #334155;
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #101c2d;
+      color: white;
+    }
+
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(7, 17, 31, 0.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #1e293b;
+      padding: 14px;
+    }
+
+    .header-content {
+      max-width: 1450px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 3px;
+    }
+
+    .app-layout {
+      max-width: 1450px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: calc(100vh - 75px);
+    }
+
+    .sidebar {
+      border-right: 1px solid #1e293b;
+      padding: 15px;
+      position: sticky;
+      top: 75px;
+      height: calc(100vh - 75px);
+      overflow-y: auto;
+    }
+
+    .nav-button {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      color: #cbd5e1;
+      margin-bottom: 7px;
+    }
+
+    .nav-button.active,
+    .nav-button:hover {
+      background: #172554;
+      color: white;
+    }
+
+    main {
+      padding: 22px;
+      min-width: 0;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: #0d1828;
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card h2,
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      background: #081421;
+      border-radius: 10px;
+      border-left: 4px solid #2563eb;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .input-group {
+      margin-bottom: 14px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 7px;
+      color: #cbd5e1;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      background: #101c2d;
+      border-radius: 12px;
+      padding: 15px;
+    }
+
+    .stat-label {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .stat-value {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+
+    .experiment-entry {
+      background: #101c2d;
+      border: 1px solid #26364c;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #26364c;
+      text-align: left;
+    }
+
+    th {
+      color: #93c5fd;
+    }
+
+    .slider-value {
+      color: #60a5fa;
+      font-weight: bold;
+    }
+
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      background: #050b14;
+      border-radius: 12px;
+      border: 1px solid #1e293b;
+    }
+
+    .timeline-item {
+      border-left: 3px solid #2563eb;
+      padding: 10px 15px;
+      margin: 10px 0;
+      background: #101c2d;
+    }
+
+    .guide-step {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      background: #101c2d;
+    }
+
+    .guide-step.current {
+      border: 2px solid #2563eb;
+    }
+
+    .small-note {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .success {
+      border-left-color: #22c55e;
+    }
+
+    .warning {
+      border-left-color: #f59e0b;
+    }
+
+    .error {
+      border-left-color: #ef4444;
+    }
+
+    @media (max-width: 800px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #1e293b;
+        display: flex;
+        overflow-x: auto;
+        gap: 5px;
+      }
+
+      .nav-button {
+        min-width: 150px;
+        margin-bottom: 0;
+      }
+
+      main {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-content">
+
+    <div>
+      <div class="title">
+        🔬 Experiment Log v2.0
+      </div>
+
+      <div class="subtitle">
+        Gravitational Deflection Research Laboratory
+      </div>
+    </div>
+
+    <button class="secondary" id="researcherButton">
+      👤 Researcher
+    </button>
+
+  </div>
+</header>
+
+<div class="app-layout">
+
+  <aside class="sidebar">
+
+    <button class="nav-button active" data-page="home">
+      🏠 Home
+    </button>
+
+    <button class="nav-button" data-page="experiment">
+      🧪 Experiment
+    </button>
+
+    <button class="nav-button" data-page="simulator">
+      🌌 Simulator
+    </button>
+
+    <button class="nav-button" data-page="analysis">
+      📊 Analysis
+    </button>
+
+    <button class="nav-button" data-page="models">
+      🧠 Models
+    </button>
+
+    <button class="nav-button" data-page="data">
+      🗂️ Data Explorer
+    </button>
+
+    <button class="nav-button" data-page="research">
+      🔬 Research Tools
+    </button>
+
+    <button class="nav-button" data-page="report">
+      📄 Report
+    </button>
+
+  </aside>
+
+  <main>
+
+    <!-- HOME -->
+
+    <section class="page active" id="home">
+
+      <div class="card">
+
+        <h2>Welcome to Experiment Log</h2>
+
+        <p>
+          Experiment Log is an interactive research environment
+          for exploring simplified gravitational light deflection
+          models and analyzing experimental datasets.
+        </p>
+
+        <div class="result" id="researcherDisplay">
+          👤 Researcher: Not selected
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <h3>📊 Dataset Dashboard — ACT 23</h3>
+
+        <div class="stat-grid" id="dashboard"></div>
+
+      </div>
+
+      <div class="card">
+
+        <h3>🧭 Guided Research Mode — ACT 16</h3>
+
+        <div id="guidedResearch"></div>
+
+        <div class="button-row">
+
+          <button id="nextGuideButton">
+            Next Step →
+          </button>
+
+          <button class="secondary" id="resetGuideButton">
+            Restart Guide
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- EXPERIMENT -->
+
+    <section class="page" id="experiment">
+
+      <div class="card">
+
+        <h2>🧪 Experiment Laboratory</h2>
+
+        <div class="grid">
+
+          <div class="input-group">
+            <label>Mass (solar masses)</label>
+
+            <input
+              type="number"
+              id="massInput"
+              value="10"
+              step="any"
+            >
+          </div>
+
+          <div class="input-group">
+
+            <label>Closest Approach (km)</label>
+
+            <input
+              type="number"
+              id="distanceInput"
+              value="1000"
+              step="any"
+            >
+
+          </div>
+
+          <div class="input-group">
+
+            <label>
+              Experimental Deflection (degrees)
+            </label>
+
+            <input
+              type="number"
+              id="experimentalInput"
+              value="0.1"
+              step="any"
+            >
+
+          </div>
+
+        </div>
+
+        <div class="button-row">
+
+          <button id="calculateButton">
+            ⚡ Calculate
+          </button>
+
+          <button id="recordButton">
+            💾 Record Experiment
+          </button>
+
+          <button class="secondary" id="qualityCheckButton">
+            🛡️ Check Data Quality
+          </button>
+
+        </div>
+
+        <div class="result" id="lensingResult"></div>
+
+        <div class="result" id="qualityResult"></div>
+
+      </div>
+
+      <!-- ACT 17 -->
+
+      <div class="card">
+
+        <h3>
+          🌌 Virtual Light Path Simulator — ACT 17
+        </h3>
+
+        <canvas id="lightCanvas" height="450"></canvas>
+
+        <p>
+          This is a simplified educational visualization,
+          not a full numerical solution of general relativity.
+        </p>
+
+      </div>
+
+      <!-- ACT 20 -->
+
+      <div class="card">
+
+        <h3>📏 Uncertainty Calculator — ACT 20</h3>
+
+        <div class="grid">
+
+          <div class="input-group">
+
+            <label>
+              Measurement uncertainty (degrees)
+            </label>
+
+            <input
+              id="uncertaintyInput"
+              type="number"
+              value="0.01"
+              step="any"
+            >
+
+          </div>
+
+        </div>
+
+        <button id="uncertaintyButton">
+          Calculate Uncertainty
+        </button>
+
+        <div class="result" id="uncertaintyResult"></div>
+
+      </div>
+
+      <!-- ACT 18 -->
+
+      <div class="card">
+
+        <h3>⚫ Multi-Object Comparison — ACT 18</h3>
+
+        <div class="grid">
+
+          <div>
+
+            <label>Object A</label>
+
+            <select id="objectA">
+
+              <option value="1">
+                Sun-like mass — 1 M☉
+              </option>
+
+              <option value="10">
+                Stellar black hole — 10 M☉
+              </option>
+
+              <option value="100">
+                Massive object — 100 M☉
+              </option>
+
+            </select>
+
+          </div>
+
+          <div>
+
+            <label>Object B</label>
+
+            <select id="objectB">
+
+              <option value="10">
+                Stellar black hole — 10 M☉
+              </option>
+
+              <option value="100">
+                Massive object — 100 M☉
+              </option>
+
+              <option value="1000000">
+                Supermassive object
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+        <br>
+
+        <button id="compareObjectsButton">
+          Compare Objects
+        </button>
+
+        <div class="result" id="objectComparisonResult"></div>
+
+      </div>
+
+      <!-- TEMPLATES -->
+
+      <div class="card">
+
+        <h3>⚡ Experiment Templates</h3>
+
+        <div class="button-row">
+
+          <button class="secondary" data-template="standard">
+            Standard
+          </button>
+
+          <button class="secondary" data-template="close">
+            Close Approach
+          </button>
+
+          <button class="secondary" data-template="distant">
+            Distant Approach
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- SIMULATOR -->
+
+    <section class="page" id="simulator">
+
+      <div class="card">
+
+        <h2>🎮 Interactive Simulator</h2>
+
+        <div class="input-group">
+
+          <label>
+            Mass:
+            <span class="slider-value" id="simMassValue"></span>
+          </label>
+
+          <input
+            type="range"
+            id="simMass"
+            min="1"
+            max="100"
+            value="10"
+          >
+
+        </div>
+
+        <div class="input-group">
+
+          <label>
+            Distance:
+            <span class="slider-value" id="simDistanceValue"></span>
+          </label>
+
+          <input
+            type="range"
+            id="simDistance"
+            min="1000"
+            max="50000"
+            value="10000"
+            step="500"
+          >
+
+        </div>
+
+        <div class="result" id="simulatorResult"></div>
+
+        <canvas id="simulatorCanvas" height="450"></canvas>
+
+      </div>
+
+      <!-- ACT 19 -->
+
+      <div class="card">
+
+        <h3>🔄 Parameter Sweep — ACT 19</h3>
+
+        <div class="grid">
+
+          <div>
+
+            <label>Start Distance</label>
+
+            <input
+              id="sweepStart"
+              type="number"
+              value="1000"
+            >
+
+          </div>
+
+          <div>
+
+            <label>End Distance</label>
+
+            <input
+              id="sweepEnd"
+              type="number"
+              value="10000"
+            >
+
+          </div>
+
+          <div>
+
+            <label>Number of Steps</label>
+
+            <input
+              id="sweepSteps"
+              type="number"
+              value="10"
+              min="2"
+              max="100"
+            >
+
+          </div>
+
+        </div>
+
+        <br>
+
+        <button id="sweepButton">
+          Run Parameter Sweep
+        </button>
+
+        <div class="result" id="sweepResult"></div>
+
+      </div>
+
+      <!-- ACT 24 -->
+
+      <div class="card">
+
+        <h3>🔮 What-If Laboratory — ACT 24</h3>
+
+        <p>
+          Change hypothetical parameters without modifying
+          your recorded experiments.
+        </p>
+
+        <div class="grid">
+
+          <div>
+
+            <label>Hypothetical Mass</label>
+
+            <input
+              id="whatIfMass"
+              type="number"
+              value="20"
+            >
+
+          </div>
+
+          <div>
+
+            <label>Hypothetical Distance</label>
+
+            <input
+              id="whatIfDistance"
+              type="number"
+              value="5000"
+            >
+
+          </div>
+
+        </div>
+
+        <br>
+
+        <button id="whatIfButton">
+          Run Hypothetical Scenario
+        </button>
+
+        <div class="result" id="whatIfResult"></div>
+
+      </div>
+
+    </section>
+
+    <!-- ANALYSIS -->
+
+    <section class="page" id="analysis">
+
+      <div class="card">
+
+        <h2>📊 Analysis Laboratory</h2>
+
+        <div class="button-row">
+
+          <button data-analysis="error">
+            ACT 1–2 Error & Anomalies
+          </button>
+
+          <button data-analysis="prediction">
+            ACT 3 Prediction
+          </button>
+
+          <button data-analysis="planner">
+            ACT 4 Planner
+          </button>
+
+          <button data-analysis="trend">
+            ACT 5 Trend
+          </button>
+
+          <button data-analysis="consistency">
+            ACT 6 Consistency
+          </button>
+
+          <button data-analysis="conclusion">
+            ACT 7 Conclusion
+          </button>
+
+          <button data-analysis="reliability">
+            ACT 9 Reliability
+          </button>
+
+          <button data-analysis="insights">
+            ACT 10 Insights
+          </button>
+
+        </div>
+
+        <div class="result" id="analysisResult"></div>
+
+      </div>
+
+      <div class="card">
+
+        <h3>📈 Correlation & Regression</h3>
+
+        <div class="button-row">
+
+          <button id="correlationButton">
+            Calculate Correlation
+          </button>
+
+          <button id="regressionButton">
+            Run Regression
+          </button>
+
+        </div>
+
+        <div class="result" id="correlationResult"></div>
+
+        <div class="result" id="regressionResult"></div>
+
+      </div>
+
+      <div class="card">
+
+        <h3>📉 Experiment Graph</h3>
+
+        <canvas id="experimentCanvas" height="450"></canvas>
+
+      </div>
+
+    </section>
+
+    <!-- MODELS -->
+
+    <section class="page" id="models">
+
+      <div class="card">
+
+        <h2>🧠 Model Comparison — ACT 20</h2>
+
+        <p>
+          Compare how different simple models describe
+          the currently recorded dataset.
+        </p>
+
+        <button id="modelComparisonButton">
+          Compare Models
+        </button>
+
+        <div class="result" id="modelComparisonResult"></div>
+
+      </div>
+
+      <div class="card">
+
+        <h3>❓ Automatic Research Questions — ACT 22</h3>
+
+        <button id="researchQuestionsButton">
+          Generate Research Questions
+        </button>
+
+        <div class="result" id="researchQuestionsResult"></div>
+
+      </div>
+
+    </section>
+
+    <!-- DATA -->
+
+    <section class="page" id="data">
+
+      <div class="card">
+
+        <h2>🔍 Interactive Data Explorer — ACT 21</h2>
+
+        <div class="grid">
+
+          <div>
+
+            <label>Search Experiment</label>
+
+            <input
+              id="searchInput"
+              placeholder="Search number..."
+            >
+
+          </div>
+
+          <div>
+
+            <label>Sort By</label>
+
+            <select id="sortSelect">
+
+              <option value="number">
+                Experiment Number
+              </option>
+
+              <option value="mass">
+                Mass
+              </option>
+
+              <option value="distance">
+                Distance
+              </option>
+
+              <option value="deviation">
+                Deviation
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+        <div class="table-wrap">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>#</th>
+                <th>Mass</th>
+                <th>Distance</th>
+                <th>Theoretical</th>
+                <th>Experimental</th>
+                <th>Deviation</th>
+                <th>Actions</th>
+              </tr>
+
+            </thead>
+
+            <tbody id="experimentTable"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+      <!-- ACT 8 -->
+
+      <div class="card">
+
+        <h3>🧪 Experiment Comparison — ACT 8</h3>
+
+        <div class="grid">
+
+          <select id="comparisonA"></select>
+
+          <select id="comparisonB"></select>
+
+        </div>
+
+        <br>
+
+        <button id="compareExperimentsButton">
+          Compare
+        </button>
+
+        <div class="result" id="comparisonResult"></div>
+
+      </div>
+
+      <!-- ACT 22 -->
+
+      <div class="card">
+
+        <h3>🔁 Reproducibility Mode — ACT 22</h3>
+
+        <select id="reproducibilitySelect"></select>
+
+        <br><br>
+
+        <button id="reproduceButton">
+          Load Configuration
+        </button>
+
+        <div class="result" id="reproducibilityResult"></div>
+
+      </div>
+
+      <!-- ACT 24 -->
+
+      <div class="card">
+
+        <h3>🔍 Duplicate & Pattern Detector — ACT 24</h3>
+
+        <button id="duplicateButton">
+          Detect Patterns
+        </button>
+
+        <div class="result" id="duplicateResult"></div>
+
+      </div>
+
+      <!-- IMPORT EXPORT -->
+
+      <div class="card">
+
+        <h3>💾 Data Management</h3>
+
+        <div class="button-row">
+
+          <button id="exportButton">
+            📤 Export JSON
+          </button>
+
+          <input
+            type="file"
+            id="importInput"
+            accept=".json"
+          >
+
+          <button class="secondary" id="importButton">
+            📥 Import
+          </button>
+
+          <button class="danger" id="resetButton">
+            🗑️ Reset All
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- RESEARCH -->
+
+    <section class="page" id="research">
+
+      <!-- ACT 23 -->
+
+      <div class="card">
+
+        <h2>⏱️ Research Timeline — ACT 23</h2>
+
+        <div id="timeline"></div>
+
+      </div>
+
+      <!-- ACT 21 -->
+
+      <div class="card">
+
+        <h3>⭐ Experiment Score</h3>
+
+        <button id="scoreButton">
+          Evaluate Dataset
+        </button>
+
+        <div class="result" id="scoreResult"></div>
+
+      </div>
+
+      <div class="card">
+
+        <h3>📝 Research Notes</h3>
+
+        <textarea
+          id="researchNotes"
+          placeholder="Write observations, hypotheses and notes..."
+        ></textarea>
+
+      </div>
+
+    </section>
+
+    <!-- REPORT -->
+
+    <section class="page" id="report">
+
+      <div class="card">
+
+        <h2>📄 Research Report Generator — ACT 25</h2>
+
+        <div class="button-row">
+
+          <button id="generateReportButton">
+            Generate Report
+          </button>
+
+          <button class="secondary" id="copyReportButton">
+            📋 Copy Report
+          </button>
+
+        </div>
+
+        <br>
+
+        <textarea
+          id="reportOutput"
+          placeholder="Your generated report will appear here..."
+        ></textarea>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+</body>
+</html>
